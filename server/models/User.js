@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 const options = {
   versionKey: false,
   timestamps: {
@@ -75,11 +76,12 @@ const attributes = {
     default: [],
     _id: false
   },
-  tasks: {
-    type: Array,
-    default: [],
-    _id: false
-  },
+  tasks: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Task'
+    }
+  ],
   targets: [
     {
       date: {

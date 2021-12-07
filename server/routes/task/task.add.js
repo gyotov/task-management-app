@@ -1,11 +1,23 @@
 require('dotenv').config({ path: __dirname })
 const paths = require('../../config').paths
 const Task = require(paths.models.task)
+const User = require(paths.models.user)
 
 const express = require('express')
 const router = new express.Router()
 
 router.post('/tasks/add', async (req, res) => {
+  const user = await User.findById(req.body.user)
+  const manager = await User.findById(req.body.manager)
+
+  if (!(user && manager)) {
+    res.status(400).send({
+      message: 'Task user and manager are required'
+    })
+
+    return
+  }
+
   const task = new Task({
     title: req.body.title,
     user: req.body.user,
@@ -19,20 +31,23 @@ router.post('/tasks/add', async (req, res) => {
     comments: req.body.comments
   })
 
-  try {
-    task.save((errors, task) => {
-      Task
-        .populate(task, { path: 'user manager comments.user' })
-        .then(response => {
-          res.status(200).send(response)
-        })
-        .catch(error => {
-          res.status(500).send(error)
-        })
+  task
+    .save()
+    .then(() => {
+      res.status(200).send(task)
     })
-  } catch (error) {
-    res.status(400).send(error)
-  }
+    .catch((errors) => {
+      const errorsObj = errors.errors
+        ? Object.entries(errors.errors).reduce((obj, error) => {
+            return {
+              ...obj,
+              [error[1].path]: error[1].message
+            }
+          }, {})
+        : errors
+
+      res.status(400).send(errorsObj)
+    })
 })
 
 module.exports = router

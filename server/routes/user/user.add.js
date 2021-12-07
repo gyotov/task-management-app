@@ -33,12 +33,14 @@ router.post('/users/add', async (req, res) => {
       res.status(200).send(generateUserData(user))
     })
     .catch((errors) => {
-      const errorsObj = Object.entries(errors.errors).reduce((obj, error) => {
-        return {
-          ...obj,
-          [error[1].path]: error[1].message
-        }
-      }, {})
+      const errorsObj = errors.errors
+        ? Object.entries(errors.errors).reduce((obj, error) => {
+            return {
+              ...obj,
+              [error[1].path]: error[1].message
+            }
+          }, {})
+        : errors
 
       res.status(400).send(errorsObj)
     })
