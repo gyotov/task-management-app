@@ -1,5 +1,6 @@
 require('./db/mongoose')
 const userRoutes = require('./routes/user/index')
+const taskRoutes = require('./routes/task/index')
 
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -14,6 +15,7 @@ app.use([
   userRoutes.delete,
   userRoutes.update,
   userRoutes.get,
+  taskRoutes.add
 ])
 
 app.listen(port, () => console.log(`> Server running at port ${port}.`))
