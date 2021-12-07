@@ -5,11 +5,17 @@ const router = new express.Router()
 
 router.delete('/users/delete/:id', async (req, res) => {
   try {
+    const user = await User.findById(req.params.id)
+
+    if (!user) {
+      throw new Error()
+
+      return
+    }
+
     await User.deleteOne({ _id: req.params.id })
 
-    res.status(200).send({
-      success: true
-    })
+    res.status(200).send(user)
   } catch (error) {
     res.status(400).send({
       errors: [
